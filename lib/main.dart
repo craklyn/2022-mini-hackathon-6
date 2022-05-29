@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:another_brother/custom_paper.dart';
 import 'package:another_brother/label_info.dart';
 import 'package:another_brother/printer_info.dart';
-import 'package:another_brother/type_b_printer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -15,6 +13,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  MyApp({Key? key}) : super(key: key);
+
   final controller = PageController(initialPage: 1);
 
   // This widget is the root of your application.
@@ -23,18 +23,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Another Brother Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: PageView(children: [QlBluetoothPrintPage(title: 'QL-1110NWB Bluetooth Sample')]),
+      home: PageView(children: const [
+        QlBluetoothPrintPage(title: 'QL-1110NWB Bluetooth Sample')
+      ]),
     );
   }
 }
@@ -53,12 +46,12 @@ class TodoItem extends StatelessWidget {
   }) : super(key: ObjectKey(todo));
 
   final Todo todo;
-  final onTodoChanged;
+  final Function onTodoChanged;
 
   TextStyle? _getTextStyle(bool checked) {
     if (!checked) return null;
 
-    return TextStyle(
+    return const TextStyle(
       color: Colors.black54,
       decoration: TextDecoration.lineThrough,
     );
@@ -79,7 +72,7 @@ class TodoItem extends StatelessWidget {
 }
 
 class QlBluetoothPrintPage extends StatefulWidget {
-  QlBluetoothPrintPage({Key? key, required this.title}) : super(key: key);
+  const QlBluetoothPrintPage({Key? key, required this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -97,7 +90,6 @@ class QlBluetoothPrintPage extends StatefulWidget {
 }
 
 class _QlBluetoothPrintPageState extends State<QlBluetoothPrintPage> {
-  bool _error = false;
   final List<Todo> _todos = <Todo>[];
   final TextEditingController _textFieldController = TextEditingController();
 
@@ -154,7 +146,7 @@ class _QlBluetoothPrintPageState extends State<QlBluetoothPrintPage> {
       return;
     }
 
-    var printer = new Printer();
+    var printer = Printer();
     var printInfo = PrinterInfo();
     printInfo.printerModel = Model.QL_1110NWB;
     printInfo.printMode = PrintMode.FIT_TO_PAGE;
@@ -167,13 +159,14 @@ class _QlBluetoothPrintPageState extends State<QlBluetoothPrintPage> {
     await printer.setPrinterInfo(printInfo);
 
     // Get a list of printers with my model available in the network.
-    List<BluetoothPrinter> printers = await printer.getBluetoothPrinters([Model.QL_1110NWB.getName()]);
+    List<BluetoothPrinter> printers =
+        await printer.getBluetoothPrinters([Model.QL_1110NWB.getName()]);
 
     if (printers.isEmpty) {
       // Show a message if no printers are found.
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(8.0),
           child: Text("No paired printers found on your device."),
         ),
       ));
@@ -189,12 +182,7 @@ class _QlBluetoothPrintPageState extends State<QlBluetoothPrintPage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+   
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -202,7 +190,7 @@ class _QlBluetoothPrintPageState extends State<QlBluetoothPrintPage> {
         title: Text(widget.title),
       ),
       body: ListView(
-        padding: EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
         children: _todos.map((Todo todo) {
           return TodoItem(
             todo: todo,
@@ -217,15 +205,15 @@ class _QlBluetoothPrintPageState extends State<QlBluetoothPrintPage> {
         // child: Icon(Icons.print),
         onPressed: () => _displayDialog(),
         tooltip: 'Add Item',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+        child: const Icon(Icons.add),
+      ), 
     );
   }
 
   Future<ui.Image> loadImage(String assetPath) async {
     final ByteData img = await rootBundle.load(assetPath);
-    final Completer<ui.Image> completer = new Completer();
-    ui.decodeImageFromList(new Uint8List.view(img.buffer), (ui.Image img) {
+    final Completer<ui.Image> completer = Completer();
+    ui.decodeImageFromList(Uint8List.view(img.buffer), (ui.Image img) {
       return completer.complete(img);
     });
     return completer.future;
