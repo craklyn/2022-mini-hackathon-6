@@ -15,9 +15,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final controller = PageController (
-      initialPage: 1
-  );
+  final controller = PageController(initialPage: 1);
 
   // This widget is the root of your application.
   @override
@@ -36,10 +34,46 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: PageView(children: [
-        QlBluetoothPrintPage(title: 'QL-1110NWB Bluetooth Sample')
-      ]),
+      home: PageView(children: [QlBluetoothPrintPage(title: 'QL-1110NWB Bluetooth Sample')]),
+    );
+  }
+}
 
+class Todo {
+  Todo({required this.name, required this.price, required this.checked});
+  final String name;
+  final double price;
+  bool checked;
+}
+
+class TodoItem extends StatelessWidget {
+  TodoItem({
+    required this.todo,
+    required this.onTodoChanged,
+  }) : super(key: ObjectKey(todo));
+
+  final Todo todo;
+  final onTodoChanged;
+
+  TextStyle? _getTextStyle(bool checked) {
+    if (!checked) return null;
+
+    return TextStyle(
+      color: Colors.black54,
+      decoration: TextDecoration.lineThrough,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      onTap: () {
+        onTodoChanged(todo);
+      },
+      leading: CircleAvatar(
+        child: Text(todo.name[0]),
+      ),
+      title: Text(todo.name, style: _getTextStyle(todo.checked)),
     );
   }
 }
@@ -63,11 +97,49 @@ class QlBluetoothPrintPage extends StatefulWidget {
 }
 
 class _QlBluetoothPrintPageState extends State<QlBluetoothPrintPage> {
-
   bool _error = false;
+  final List<Todo> _todos = <Todo>[];
+  final TextEditingController _textFieldController = TextEditingController();
+
+  Future<void> _displayDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add a new todo item'),
+          content: TextField(
+            controller: _textFieldController,
+            decoration: const InputDecoration(hintText: 'Type your new todo'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Add'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _addTodoItem(_textFieldController.text);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _addTodoItem(String name) {
+    setState(() {
+      _todos.add(Todo(name: name, price: 0.00, checked: false));
+    });
+    _textFieldController.clear();
+  }
+
+  void _handleTodoChange(Todo todo) {
+    setState(() {
+      todo.checked = !todo.checked;
+    });
+  }
 
   void print(BuildContext context) async {
-
     //////////////////////////////////////////////////
     /// Request the Storage permissions required by
     /// another_brother to print.
@@ -113,12 +185,10 @@ class _QlBluetoothPrintPageState extends State<QlBluetoothPrintPage> {
 
     printer.setPrinterInfo(printInfo);
     printer.printImage(await loadImage('assets/brother_hack.png'));
-
   }
+
   @override
   Widget build(BuildContext context) {
-
-
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -131,24 +201,23 @@ class _QlBluetoothPrintPageState extends State<QlBluetoothPrintPage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text("Don't forget to grant permissions to your app in Settings.", textAlign: TextAlign.center,),
-            ),
-            Image(image: AssetImage('assets/brother_hack.png'))
-          ],
-        ),
+      body: ListView(
+        padding: EdgeInsets.symmetric(vertical: 8.0),
+        children: _todos.map((Todo todo) {
+          return TodoItem(
+            todo: todo,
+            onTodoChanged: _handleTodoChange,
+          );
+        }).toList(),
       ),
+
       floatingActionButton: FloatingActionButton(
-        onPressed: () => print(context),
-        tooltip: 'Print',
-        child: Icon(Icons.print),
+        // onPressed: () => print(context),
+        // tooltip: 'Print',
+        // child: Icon(Icons.print),
+        onPressed: () => _displayDialog(),
+        tooltip: 'Add Item',
+        child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
