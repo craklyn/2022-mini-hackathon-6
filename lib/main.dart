@@ -1,5 +1,4 @@
 import 'package:demo_another_brother_prime/authenticate.dart';
-import 'package:demo_another_brother_prime/ql_bluetooth_print_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,11 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: PageView(children: const [
-        Authenticate(),
-        QlBluetoothPrintPage(title: 'QL-1110NWB Bluetooth Sample')
-      ]),
+      home: const Authenticate(),
     );
   }
 }
-

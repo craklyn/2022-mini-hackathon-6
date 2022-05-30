@@ -1,5 +1,6 @@
 import 'package:demo_another_brother_prime/models/quickbooks_api.dart';
 import 'package:demo_another_brother_prime/providers.dart';
+import 'package:demo_another_brother_prime/ql_bluetooth_print_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -24,6 +25,9 @@ class QBWebView extends ConsumerWidget {
           // Request access token
           ref.read(quickBooksProvider).requestAccessToken(code, realmId);
 
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => const QlBluetoothPrintPage(
+                  title: 'QL-1110NWB Bluetooth Sample')));
           return NavigationDecision.prevent;
         }
         debugPrint('allowing navigation to $request');
