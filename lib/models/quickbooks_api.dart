@@ -1,7 +1,11 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:another_quickbooks/another_quickbooks.dart';
 import 'package:another_quickbooks/quickbook_models.dart';
 import 'package:demo_another_brother_prime/secrets.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 enum DetailType {
   // ignore: constant_identifier_names
@@ -75,11 +79,30 @@ class QuickBooksAPI extends ChangeNotifier {
         ),
       ],
     );
-    
+
     Invoice? createdInvoice = await quickClient
         ?.getAccountingClient()
         .createInvoice(
             invoice: invoice, realmId: realmId, authToken: token?.access_token);
     return createdInvoice;
+  }
+
+  Future<File?> downloadPDF(Invoice invoice) async {
+    if (invoice.id == null) {
+      return null;
+    } else {
+      Uint8List pdfBytes = await quickClient!
+          .getAccountingClient()
+          .getInvoicePdf(
+              realmId: realmId,
+              invoiceId: invoice.id!,
+              authToken: token?.access_token);
+
+      // create a pdf file in a temporary directory from the Uint8List pdfPytes
+      final tempDir = await getTemporaryDirectory();
+      final pdf = File('${tempDir.path}/temp.pdf');
+      pdf.writeAsBytesSync(pdfBytes);
+      return pdf;
+    }
   }
 }

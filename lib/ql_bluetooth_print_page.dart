@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:another_quickbooks/quickbook_models.dart';
+import 'package:demo_another_brother_prime/invoice_viewer.dart';
 import 'package:demo_another_brother_prime/models/todo.dart';
 import 'package:demo_another_brother_prime/providers.dart';
 import 'package:demo_another_brother_prime/todo_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 
 class QlBluetoothPrintPage extends ConsumerStatefulWidget {
   const QlBluetoothPrintPage({Key? key, required this.title}) : super(key: key);
@@ -70,7 +75,25 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
             onPressed: () async {
               Invoice? newInvoice = await ref.read(quickBooksProvider).createInvoice();
               if (newInvoice != null) {
-
+                File? pdf = await ref.read(quickBooksProvider).downloadPDF(newInvoice);
+                if(pdf != null) {
+                  print('pdf: ${pdf.path} $pdf');
+                  Get.to(() => InvoiceViewer(receiptPath: pdf.path));
+                }
+                else {
+                  Fluttertoast.showToast(
+                      msg: "Error downloading PDF",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0
+                  );
+                }
+              }
+              else {
+                Fluttertoast.showToast(msg: 'Error creating invoice');
               }
             },
           ),
