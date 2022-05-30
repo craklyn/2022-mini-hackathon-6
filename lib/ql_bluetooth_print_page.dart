@@ -70,6 +70,26 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
     });
   }
 
+  void _createInvoice() {
+    var lines = [];
+
+    for (var i = 0; i < _todos.length; i++) {
+      lines.add(SalesItemLine(
+          amount: double.parse(_todos[i].price.toStringAsFixed(2)),
+          description: _todos[i].name,
+          lineNum: 1,
+          detailType: DetailType.SalesItemLineDetail.name,
+          salesItemLineDetail: SalesItemLineDetail(
+            qty: 1,
+            unitPrice: double.parse(_todos[i].price.toStringAsFixed(2)),
+          )
+      ));
+    }
+
+    // await ref.read(quickBooksProvider).createInvoiceFromLines(lines);
+    ref.read(quickBooksProvider).createInvoiceFromLines(lines);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

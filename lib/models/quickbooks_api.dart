@@ -53,6 +53,19 @@ class QuickBooksAPI extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<Invoice?> createInvoiceFromLines(lines) async {
+    Invoice invoice = Invoice(
+      customerRef: ReferenceType(name: 'Test client', value: '1'),
+      line: lines
+    );
+
+    Invoice? createdInvoice = await quickClient
+        ?.getAccountingClient()
+        .createInvoice(
+            invoice: invoice, realmId: realmId, authToken: token?.access_token);
+    return createdInvoice;
+  }
+
   Future<Invoice?> createInvoice() async {
     Invoice invoice = Invoice(
       customerRef: ReferenceType(name: 'Test client', value: '1'),
