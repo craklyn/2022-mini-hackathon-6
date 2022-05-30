@@ -1,7 +1,7 @@
 import 'package:demo_another_brother_prime/providers.dart';
+import 'package:demo_another_brother_prime/q_b_web_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 class Authenticate extends ConsumerStatefulWidget {
   const Authenticate({Key? key}) : super(key: key);
@@ -45,10 +45,7 @@ class _AuthenticateState extends ConsumerState<Authenticate> {
               if (hasToken) {
                 return const Text('You have been authenticated!');
               } else {
-                return WebView(
-                  initialUrl: ref.read(quickBooksProvider).authUrl ?? '',
-                  javascriptMode: JavascriptMode.unrestricted,
-                );
+                return QBWebView();
               }
             }),
       ),
