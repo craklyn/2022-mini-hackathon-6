@@ -1,8 +1,23 @@
-import 'package:demo_another_brother_prime/models/quickbooks_api.dart';
+import 'package:demo_another_brother_prime/providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
-class Authenticate extends StatelessWidget {
+class Authenticate extends ConsumerStatefulWidget {
   const Authenticate({Key? key}) : super(key: key);
+
+  @override
+  ConsumerState<Authenticate> createState() => _AuthenticateState();
+}
+
+class _AuthenticateState extends ConsumerState<Authenticate> {
+  late final Future<void> _initializeQuickbooks;
+
+  @override
+  void initState() {
+    _initializeQuickbooks = ref.read(quickBooksProvider).initializeQuickbooks();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,20 +27,29 @@ class Authenticate extends StatelessWidget {
       ),
       body: Center(
         child: FutureBuilder<void>(
-            future: QuickBooksAPI.initializeQuickbooks(),
+            future: _initializeQuickbooks,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Initializing Quickbooks...'),
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Initializing Quickbooks...'),
                   ],
                 );
               }
-              return Container();
+
+              bool hasToken = ref.read(quickBooksProvider).token != null;
+              if (hasToken) {
+                return const Text('You have been authenticated!');
+              } else {
+                return WebView(
+                  initialUrl: ref.read(quickBooksProvider).authUrl ?? '',
+                  javascriptMode: JavascriptMode.unrestricted,
+                );
+              }
             }),
       ),
     );
