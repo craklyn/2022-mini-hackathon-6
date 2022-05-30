@@ -5,6 +5,7 @@ import 'package:demo_another_brother_prime/invoice_viewer.dart';
 import 'package:demo_another_brother_prime/models/todo.dart';
 import 'package:demo_another_brother_prime/providers.dart';
 import 'package:demo_another_brother_prime/todo_item.dart';
+import 'package:demo_another_brother_prime/widgets/is_generating_invoice_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -63,7 +64,6 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -73,14 +73,18 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
           IconButton(
             icon: const Icon(Icons.receipt),
             onPressed: () async {
-              Invoice? newInvoice = await ref.read(quickBooksProvider).createInvoice();
+              ref.read(screenProvider).setIsGeneratingInvoice(true);
+              showDialog(
+                  context: context,
+                  builder: (context) => const IsGeneratingInvoiceDialog());
+              Invoice? newInvoice =
+                  await ref.read(quickBooksProvider).createInvoice();
               if (newInvoice != null) {
-                File? pdf = await ref.read(quickBooksProvider).downloadPDF(newInvoice);
-                if(pdf != null) {
-                  print('pdf: ${pdf.path} $pdf');
+                File? pdf =
+                    await ref.read(quickBooksProvider).downloadPDF(newInvoice);
+                if (pdf != null) {
                   Get.to(() => InvoiceViewer(receiptPath: pdf.path));
-                }
-                else {
+                } else {
                   Fluttertoast.showToast(
                       msg: "Error downloading PDF",
                       toastLength: Toast.LENGTH_SHORT,
@@ -88,11 +92,9 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
                       timeInSecForIosWeb: 1,
                       backgroundColor: Colors.red,
                       textColor: Colors.white,
-                      fontSize: 16.0
-                  );
+                      fontSize: 16.0);
                 }
-              }
-              else {
+              } else {
                 Fluttertoast.showToast(msg: 'Error creating invoice');
               }
             },
@@ -108,7 +110,6 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
           );
         }).toList(),
       ),
-
       floatingActionButton: FloatingActionButton(
         // onPressed: () => print(context),
         // tooltip: 'Print',
