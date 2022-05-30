@@ -70,7 +70,7 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
             onPressed: () async {
               Invoice? newInvoice = await ref.read(quickBooksProvider).createInvoice();
               if (newInvoice != null) {
-                print('Invoice created: ${newInvoice.toJson()}');
+
               }
             },
           ),

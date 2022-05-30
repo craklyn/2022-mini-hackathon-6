@@ -1,6 +1,7 @@
 import 'package:another_brother/label_info.dart';
 import 'package:another_brother/printer_info.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -50,12 +51,7 @@ class PrintAPI {
 
     if (printers.isEmpty) {
       // Show a message if no printers are found.
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Text("No paired printers found on your device."),
-        ),
-      ));
+      Fluttertoast.showToast(msg: "No paired printers found on your device.");
 
       return;
     }
