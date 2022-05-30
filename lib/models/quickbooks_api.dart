@@ -3,6 +3,11 @@ import 'package:another_quickbooks/quickbook_models.dart';
 import 'package:demo_another_brother_prime/secrets.dart';
 import 'package:flutter/material.dart';
 
+enum DetailType {
+  // ignore: constant_identifier_names
+  SalesItemLineDetail,
+}
+
 class QuickBooksAPI extends ChangeNotifier {
   TokenResponse? token;
   String? realmId;
@@ -34,7 +39,6 @@ class QuickBooksAPI extends ChangeNotifier {
         scopes: [Scope.Payments, Scope.Accounting],
         redirectUrl: redirectUrl,
         state: "state123");
-    debugPrint(authUrl);
     notifyListeners();
   }
 
@@ -43,5 +47,39 @@ class QuickBooksAPI extends ChangeNotifier {
     token = await quickClient!
         .getAuthToken(code: code, redirectUrl: redirectUrl, realmId: realmId!);
     notifyListeners();
+  }
+
+  Future<Invoice?> createInvoice() async {
+    Invoice invoice = Invoice(
+      customerRef: ReferenceType(name: 'Test client', value: '1'),
+      line: [
+        SalesItemLine(
+          amount: 100,
+          description: 'Test item',
+          lineNum: 1,
+          detailType: DetailType.SalesItemLineDetail.name,
+          salesItemLineDetail: SalesItemLineDetail(
+            qty: 1,
+            unitPrice: 100,
+          ),
+        ),
+        SalesItemLine(
+          amount: 50,
+          description: 'Test item 2',
+          lineNum: 2,
+          detailType: DetailType.SalesItemLineDetail.name,
+          salesItemLineDetail: SalesItemLineDetail(
+            qty: 5,
+            unitPrice: 10,
+          ),
+        ),
+      ],
+    );
+    
+    Invoice? createdInvoice = await quickClient
+        ?.getAccountingClient()
+        .createInvoice(
+            invoice: invoice, realmId: realmId, authToken: token?.access_token);
+    return createdInvoice;
   }
 }

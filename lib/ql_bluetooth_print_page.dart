@@ -1,8 +1,11 @@
+import 'package:another_quickbooks/quickbook_models.dart';
 import 'package:demo_another_brother_prime/models/todo.dart';
+import 'package:demo_another_brother_prime/providers.dart';
 import 'package:demo_another_brother_prime/todo_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class QlBluetoothPrintPage extends StatefulWidget {
+class QlBluetoothPrintPage extends ConsumerStatefulWidget {
   const QlBluetoothPrintPage({Key? key, required this.title}) : super(key: key);
 
   final String title;
@@ -11,7 +14,7 @@ class QlBluetoothPrintPage extends StatefulWidget {
   QlBluetoothPrintPageState createState() => QlBluetoothPrintPageState();
 }
 
-class QlBluetoothPrintPageState extends State<QlBluetoothPrintPage> {
+class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
   final List<Todo> _todos = <Todo>[];
   final TextEditingController _textFieldController = TextEditingController();
 
@@ -64,7 +67,12 @@ class QlBluetoothPrintPageState extends State<QlBluetoothPrintPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.receipt),
-            onPressed: () {},
+            onPressed: () async {
+              Invoice? newInvoice = await ref.read(quickBooksProvider).createInvoice();
+              if (newInvoice != null) {
+                print('Invoice created: ${newInvoice.toJson()}');
+              }
+            },
           ),
         ],
       ),

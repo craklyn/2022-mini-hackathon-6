@@ -45,7 +45,7 @@ class _AuthenticateState extends ConsumerState<Authenticate> {
               if (hasToken) {
                 return const Text('You have been authenticated!');
               } else {
-                return QBWebView();
+                return const QBWebView();
               }
             }),
       ),
