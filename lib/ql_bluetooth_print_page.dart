@@ -23,6 +23,7 @@ class QlBluetoothPrintPage extends ConsumerStatefulWidget {
 class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
   final List<Todo> _todos = <Todo>[];
   final TextEditingController _textFieldController = TextEditingController();
+  final TextEditingController _priceFieldController = TextEditingController();
 
   Future<void> _displayDialog() async {
     return showDialog<void>(
@@ -30,17 +31,23 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add a new todo item'),
-          content: TextField(
-            controller: _textFieldController,
-            decoration: const InputDecoration(hintText: 'Type your new todo'),
-          ),
+          title: const Text('Add item to invoice'),
+          content: Column(children: <Widget>[
+            TextField(
+              controller: _textFieldController,
+              decoration: const InputDecoration(hintText: 'Enter item description'),
+            ),
+            TextField(
+              controller: _priceFieldController,
+              decoration: const InputDecoration(hintText: 'Enter item price'),
+            ),
+          ]),
           actions: <Widget>[
             TextButton(
               child: const Text('Add'),
               onPressed: () {
                 Navigator.of(context).pop();
-                _addTodoItem(_textFieldController.text);
+                _addTodoItem(_textFieldController.text, _priceFieldController.text);
               },
             ),
           ],
@@ -49,11 +56,12 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
     );
   }
 
-  void _addTodoItem(String name) {
+  void _addTodoItem(String name, String price) {
     setState(() {
-      _todos.add(Todo(name: name, price: 0.00, checked: false));
+      _todos.add(Todo(name: name, price: double.parse(price), checked: false));
     });
     _textFieldController.clear();
+    _priceFieldController.clear();
   }
 
   void _handleTodoChange(Todo todo) {

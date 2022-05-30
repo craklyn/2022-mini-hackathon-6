@@ -28,7 +28,7 @@ class TodoItem extends StatelessWidget {
       leading: CircleAvatar(
         child: Text(todo.name[0]),
       ),
-      title: Text(todo.name, style: _getTextStyle(todo.checked)),
+      title: Text('${todo.name}: \$${todo.price.toStringAsFixed(2)}', style: _getTextStyle(todo.checked)),
     );
   }
 }
