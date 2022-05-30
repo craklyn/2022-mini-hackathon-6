@@ -33,6 +33,7 @@ dependencies:
   another_brother: ^0.0.26
   another_quickbooks: ^0.0.5
   cupertino_icons: ^1.0.4
+  flutter_riverpod: ^1.0.4
   permission_handler: ^9.2.0
 
 
