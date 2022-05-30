@@ -5,22 +5,13 @@ import 'package:flutter/material.dart';
 class QlBluetoothPrintPage extends StatefulWidget {
   const QlBluetoothPrintPage({Key? key, required this.title}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
-  _QlBluetoothPrintPageState createState() => _QlBluetoothPrintPageState();
+  QlBluetoothPrintPageState createState() => QlBluetoothPrintPageState();
 }
 
-class _QlBluetoothPrintPageState extends State<QlBluetoothPrintPage> {
+class QlBluetoothPrintPageState extends State<QlBluetoothPrintPage> {
   final List<Todo> _todos = <Todo>[];
   final TextEditingController _textFieldController = TextEditingController();
 
@@ -70,6 +61,12 @@ class _QlBluetoothPrintPageState extends State<QlBluetoothPrintPage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.receipt),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
