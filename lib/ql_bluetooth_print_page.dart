@@ -11,6 +11,7 @@ import 'package:demo_another_brother_prime/widgets/is_printing_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
@@ -123,20 +124,45 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isEmpty = _todos.isEmpty;
+
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+
+        title: Text(
+          widget.title,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        children: _todos.map((Todo todo) {
-          return TodoItem(
-            todo: todo,
-            onTodoChanged: _handleTodoChange,
-          );
-        }).toList(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 32),
+            SvgPicture.asset(
+              'assets/houses.svg',
+              width: MediaQuery.of(context).size.width * 0.75,
+            ),
+            Expanded(
+              child: (isEmpty)
+                  ? const Center(
+                      child: Text(
+                          'Click the button to add your first invoice item'))
+                  : ListView(
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      children: _todos.map((Todo todo) {
+                        return TodoItem(
+                          todo: todo,
+                          onTodoChanged: _handleTodoChange,
+                        );
+                      }).toList(),
+                    ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: SpeedDial(
         icon: Icons.add_task,
