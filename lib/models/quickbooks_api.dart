@@ -53,7 +53,7 @@ class QuickBooksAPI extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Invoice?> createInvoiceFromLines(lines) async {
+  Future<Invoice?> createInvoiceFromLines(List<Line>? lines) async {
     Invoice invoice = Invoice(
       customerRef: ReferenceType(name: 'Test client', value: '1'),
       line: lines

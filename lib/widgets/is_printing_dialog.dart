@@ -68,7 +68,7 @@ class _IsPrintingDialogState extends ConsumerState<IsPrintingDialog> {
             Material(
               color: Theme.of(context).primaryColor,
               child: const Text(
-                'Printing receipt...',
+                'Printing invoice...',
                 style: TextStyle(
                     fontSize: 22,
                     color: Colors.white,

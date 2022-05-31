@@ -1,14 +1,16 @@
 import 'dart:io';
 
 import 'package:another_quickbooks/quickbook_models.dart';
-import 'package:demo_another_brother_prime/invoice_viewer.dart';
 import 'package:demo_another_brother_prime/models/quickbooks_api.dart';
 import 'package:demo_another_brother_prime/models/todo.dart';
+import 'package:demo_another_brother_prime/print_api.dart';
 import 'package:demo_another_brother_prime/providers.dart';
 import 'package:demo_another_brother_prime/todo_item.dart';
 import 'package:demo_another_brother_prime/widgets/is_generating_invoice_dialog.dart';
+import 'package:demo_another_brother_prime/widgets/is_printing_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
@@ -36,7 +38,8 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
           content: Column(children: <Widget>[
             TextField(
               controller: _textFieldController,
-              decoration: const InputDecoration(hintText: 'Enter item description'),
+              decoration:
+                  const InputDecoration(hintText: 'Enter item description'),
             ),
             TextField(
               controller: _priceFieldController,
@@ -48,7 +51,8 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
               child: const Text('Add'),
               onPressed: () {
                 Navigator.of(context).pop();
-                _addTodoItem(_textFieldController.text, _priceFieldController.text);
+                _addTodoItem(
+                    _textFieldController.text, _priceFieldController.text);
               },
             ),
           ],
@@ -71,8 +75,8 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
     });
   }
 
-  void _createInvoice() {
-    var lines = [];
+  void _createInvoice() async {
+    List<Line>? lines = <Line>[];
 
     for (var i = 0; i < _todos.length; i++) {
       lines.add(SalesItemLine(
@@ -83,12 +87,38 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
           salesItemLineDetail: SalesItemLineDetail(
             qty: 1,
             unitPrice: double.parse(_todos[i].price.toStringAsFixed(2)),
-          )
-      ));
+          )));
     }
-
-    // await ref.read(quickBooksProvider).createInvoiceFromLines(lines);
-    ref.read(quickBooksProvider).createInvoiceFromLines(lines);
+    ref.read(screenProvider).setIsGeneratingInvoice(true);
+    showDialog(
+        context: context,
+        builder: (context) => const IsGeneratingInvoiceDialog());
+    Invoice? newInvoice =
+        await ref.read(quickBooksProvider).createInvoiceFromLines(lines);
+    ref.read(screenProvider).setIsGeneratingInvoice(false);
+    if (newInvoice != null) {
+      File? pdf = await ref.read(quickBooksProvider).downloadPDF(newInvoice);
+      if (pdf != null) {
+        ref.read(screenProvider).setIsPrinting(true);
+        showDialog(
+            context: context, builder: (context) => const IsPrintingDialog());
+        // ignore: use_build_context_synchronously
+        await PrintAPI.printPDF(context, pdf.path);
+        Get.offAll(() =>
+            const QlBluetoothPrintPage(title: 'QL-1110NWB Bluetooth Sample'));
+      } else {
+        Fluttertoast.showToast(
+            msg: "Error downloading PDF",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+    } else {
+      Fluttertoast.showToast(msg: 'Error creating invoice');
+    }
   }
 
   @override
@@ -98,37 +128,6 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.receipt),
-            onPressed: () async {
-              ref.read(screenProvider).setIsGeneratingInvoice(true);
-              showDialog(
-                  context: context,
-                  builder: (context) => const IsGeneratingInvoiceDialog());
-              Invoice? newInvoice =
-                  await ref.read(quickBooksProvider).createInvoice();
-              if (newInvoice != null) {
-                File? pdf =
-                    await ref.read(quickBooksProvider).downloadPDF(newInvoice);
-                if (pdf != null) {
-                  Get.to(() => InvoiceViewer(receiptPath: pdf.path));
-                } else {
-                  Fluttertoast.showToast(
-                      msg: "Error downloading PDF",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                      fontSize: 16.0);
-                }
-              } else {
-                Fluttertoast.showToast(msg: 'Error creating invoice');
-              }
-            },
-          ),
-        ],
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -139,13 +138,21 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
           );
         }).toList(),
       ),
-      floatingActionButton: FloatingActionButton(
-        // onPressed: () => print(context),
-        // tooltip: 'Print',
-        // child: Icon(Icons.print),
-        onPressed: () => _displayDialog(),
-        tooltip: 'Add Item',
-        child: const Icon(Icons.add),
+      floatingActionButton: SpeedDial(
+        icon: Icons.add_task,
+        activeIcon: Icons.close,
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.add),
+            onTap: _displayDialog,
+            label: 'Add item',
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.print),
+            onTap: _createInvoice,
+            label: 'Print invoice',
+          ),
+        ],
       ),
     );
   }
