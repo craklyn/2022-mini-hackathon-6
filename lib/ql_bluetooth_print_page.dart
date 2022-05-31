@@ -33,21 +33,36 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
   Future<void> _displayDialog() async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // user must tap button!
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add item to invoice'),
-          content: Column(children: <Widget>[
-            TextField(
-              controller: _textFieldController,
-              decoration:
-                  const InputDecoration(hintText: 'Enter item description'),
+          titlePadding: const EdgeInsets.all(0.0),
+          title: Container(
+            padding: const EdgeInsets.all(16.0),
+            margin: const EdgeInsets.all(0.0),
+            color: Theme.of(context).primaryColor,
+            child: const Text(
+              'Add item to invoice',
+              style: TextStyle(
+                color: Colors.white,
+              ),
             ),
-            TextField(
-              controller: _priceFieldController,
-              decoration: const InputDecoration(hintText: 'Enter item price'),
-            ),
-          ]),
+          ),
+          content: Column(
+              mainAxisSize:
+                  MainAxisSize.min, // shrinks dialog to fit the content
+              children: <Widget>[
+                TextField(
+                  controller: _textFieldController,
+                  decoration:
+                      const InputDecoration(hintText: 'Enter item description'),
+                ),
+                TextField(
+                  controller: _priceFieldController,
+                  decoration:
+                      const InputDecoration(hintText: 'Enter item price'),
+                ),
+              ]),
           actions: <Widget>[
             TextButton(
               child: const Text('Add'),
@@ -106,8 +121,7 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
             context: context, builder: (context) => const IsPrintingDialog());
         // ignore: use_build_context_synchronously
         await PrintAPI.printPDF(context, pdf.path);
-        Get.offAll(() =>
-            const QlBluetoothPrintPage(title: Constants.appName));
+        Get.offAll(() => const QlBluetoothPrintPage(title: Constants.appName));
       } else {
         Fluttertoast.showToast(
             msg: "Error downloading PDF",
