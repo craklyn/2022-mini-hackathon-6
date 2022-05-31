@@ -2,7 +2,7 @@
     package="com.rouninlabs.demo_another_brother_prime">
    <application
         android:label="demo_another_brother_prime"
-        android:name="${applicationName}"
+        android:name="Hana Hui"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

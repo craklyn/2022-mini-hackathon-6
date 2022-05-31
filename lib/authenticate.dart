@@ -1,3 +1,4 @@
+import 'package:demo_another_brother_prime/constants.dart';
 import 'package:demo_another_brother_prime/providers.dart';
 import 'package:demo_another_brother_prime/q_b_web_view.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ class _AuthenticateState extends ConsumerState<Authenticate> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('QL-1110NWB Bluetooth Sample'),
+        title: const Text(Constants.appName),
       ),
       body: Center(
         child: FutureBuilder<void>(

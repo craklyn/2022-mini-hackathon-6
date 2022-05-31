@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:another_quickbooks/quickbook_models.dart';
+import 'package:demo_another_brother_prime/constants.dart';
 import 'package:demo_another_brother_prime/models/quickbooks_api.dart';
 import 'package:demo_another_brother_prime/models/todo.dart';
 import 'package:demo_another_brother_prime/print_api.dart';
@@ -106,7 +107,7 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
         // ignore: use_build_context_synchronously
         await PrintAPI.printPDF(context, pdf.path);
         Get.offAll(() =>
-            const QlBluetoothPrintPage(title: 'QL-1110NWB Bluetooth Sample'));
+            const QlBluetoothPrintPage(title: Constants.appName));
       } else {
         Fluttertoast.showToast(
             msg: "Error downloading PDF",
