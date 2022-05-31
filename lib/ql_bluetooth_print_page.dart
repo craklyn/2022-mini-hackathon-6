@@ -168,6 +168,7 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
       floatingActionButton: SpeedDial(
         icon: Icons.add_task,
         activeIcon: Icons.close,
+        spaceBetweenChildren: 16,
         children: [
           SpeedDialChild(
             child: const Icon(Icons.add),
