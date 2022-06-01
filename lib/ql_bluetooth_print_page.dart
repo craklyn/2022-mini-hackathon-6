@@ -10,6 +10,7 @@ import 'package:demo_another_brother_prime/todo_item.dart';
 import 'package:demo_another_brother_prime/widgets/is_generating_invoice_dialog.dart';
 import 'package:demo_another_brother_prime/widgets/is_printing_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -65,6 +66,8 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
                   controller: _priceFieldController,
                   decoration:
                       const InputDecoration(hintText: 'Enter item price'),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))], // allow two digit decimal numbers
                 ),
               ]),
           actions: <Widget>[
@@ -171,16 +174,19 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
                       'Click the button to add your first invoice item',
                       style: GoogleFonts.montserrat(),
                     ))
-                  : ListView(
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      children: _todos.map((Todo todo) {
-                        return TodoItem(
-                          todo: todo,
-                          onTodoChanged: _handleTodoChange,
-                        );
-                      }).toList(),
-                    ),
+                  : Padding(
+                    padding: const EdgeInsets.only(top: 32.0),
+                    child: ListView(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        children: _todos.map((Todo todo) {
+                          return TodoItem(
+                            todo: todo,
+                            onTodoChanged: _handleTodoChange,
+                          );
+                        }).toList(),
+                      ),
+                  ),
             ),
           ],
         ),
