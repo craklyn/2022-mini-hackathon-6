@@ -174,19 +174,28 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
                       'Click the button to add your first invoice item',
                       style: GoogleFonts.montserrat(),
                     ))
-                  : Padding(
-                    padding: const EdgeInsets.only(top: 32.0),
-                    child: ListView(
-                        shrinkWrap: true,
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        children: _todos.map((Todo todo) {
-                          return TodoItem(
-                            todo: todo,
-                            onTodoChanged: _handleTodoChange,
-                          );
-                        }).toList(),
-                      ),
-                  ),
+                  : DataTable(
+                      columns: const <DataColumn>[
+                        DataColumn(
+                          label: Text(
+                            'Item',
+                            style: TextStyle(fontStyle: FontStyle.italic),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Text(
+                            'Price',
+                            style: TextStyle(fontStyle: FontStyle.italic),
+                          ),
+                        ),
+                      ],
+                      rows: _todos.map((Todo todo) {
+                        return DataRow(cells: <DataCell>[
+                          DataCell(Text('${todo.name}')),
+                          DataCell(Text('\$${todo.price}')),
+                        ]);
+                      }).toList(),
+                    ),
             ),
           ],
         ),
