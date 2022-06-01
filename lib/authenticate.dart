@@ -24,7 +24,10 @@ class _AuthenticateState extends ConsumerState<Authenticate> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(Constants.appName),
+        title: Text(
+          Constants.appName,
+          style: Constants.header,
+        ),
       ),
       body: Center(
         child: FutureBuilder<void>(
@@ -34,17 +37,23 @@ class _AuthenticateState extends ConsumerState<Authenticate> {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 16),
-                    Text('Initializing Quickbooks...'),
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Initializing Quickbooks...',
+                      style: Constants.customFont,
+                    ),
                   ],
                 );
               }
 
               bool hasToken = ref.read(quickBooksProvider).token != null;
               if (hasToken) {
-                return const Text('You have been authenticated!');
+                return Text(
+                  'You have been authenticated!',
+                  style: Constants.customFont,
+                );
               } else {
                 return const QBWebView();
               }
