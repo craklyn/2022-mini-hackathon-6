@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:another_quickbooks/quickbook_models.dart';
+import 'package:demo_another_brother_prime/add_item_alert_dialog.dart';
 import 'package:demo_another_brother_prime/constants.dart';
+import 'package:demo_another_brother_prime/customers.dart' as my;
 import 'package:demo_another_brother_prime/models/quickbooks_api.dart';
 import 'package:demo_another_brother_prime/models/todo.dart';
 import 'package:demo_another_brother_prime/print_api.dart';
@@ -9,7 +11,6 @@ import 'package:demo_another_brother_prime/providers.dart';
 import 'package:demo_another_brother_prime/widgets/is_generating_invoice_dialog.dart';
 import 'package:demo_another_brother_prime/widgets/is_printing_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -27,94 +28,40 @@ class QlBluetoothPrintPage extends ConsumerStatefulWidget {
 }
 
 class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
-  final List<Todo> _todos = <Todo>[];
-  final TextEditingController _textFieldController = TextEditingController();
-  final TextEditingController _priceFieldController = TextEditingController();
-
-  Future<void> _displayDialog() async {
+  Future<void> _displayDialog(List<Todo> todos) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
-        return AlertDialog(
-          titlePadding: const EdgeInsets.all(0.0),
-          title: Container(
-            padding: const EdgeInsets.all(16.0),
-            margin: const EdgeInsets.all(0.0),
-            color: Theme.of(context).primaryColor,
-            child: Text(
-              'Add item to invoice',
-              style: GoogleFonts.montserrat(
-                textStyle: const TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-          content: Column(
-              mainAxisSize:
-                  MainAxisSize.min, // shrinks dialog to fit the content
-              children: <Widget>[
-                SvgPicture.asset('assets/invoice.svg', width: 150, height: 150),
-                TextField(
-                  controller: _textFieldController,
-                  decoration:
-                      const InputDecoration(hintText: 'Enter item description'),
-                ),
-                TextField(
-                  controller: _priceFieldController,
-                  decoration:
-                      const InputDecoration(hintText: 'Enter item price'),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
-                  ], // allow two digit decimal numbers
-                ),
-              ]),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Add', style: Constants.customFont),
-              onPressed: () {
-                Navigator.of(context).pop();
-                _addTodoItem(
-                    _textFieldController.text, _priceFieldController.text);
-              },
-            ),
-          ],
-        );
+        return const AddItemAlertDialog();
       },
     );
   }
 
-  void _addTodoItem(String name, String price) {
-    setState(() {
-      _todos.add(Todo(name: name, price: double.parse(price), checked: false));
-    });
-    _textFieldController.clear();
-    _priceFieldController.clear();
-  }
-
-  void _createInvoice() async {
+  void _createInvoice(List<Todo> todos) async {
     List<Line>? lines = <Line>[];
 
-    for (var i = 0; i < _todos.length; i++) {
+    for (var i = 0; i < todos.length; i++) {
       lines.add(SalesItemLine(
-          amount: double.parse(_todos[i].price.toStringAsFixed(2)),
-          description: _todos[i].name,
+          amount: double.parse(todos[i].price.toStringAsFixed(2)),
+          description: todos[i].name,
           lineNum: 1,
           detailType: DetailType.SalesItemLineDetail.name,
           salesItemLineDetail: SalesItemLineDetail(
             qty: 1,
-            unitPrice: double.parse(_todos[i].price.toStringAsFixed(2)),
+            unitPrice: double.parse(todos[i].price.toStringAsFixed(2)),
           )));
     }
     ref.read(screenProvider).setIsGeneratingInvoice(true);
     showDialog(
         context: context,
         builder: (context) => const IsGeneratingInvoiceDialog());
-    Invoice? newInvoice =
-        await ref.read(quickBooksProvider).createInvoiceFromLines(lines);
+
+    my.Customer customer = ref.read(customerProvider).selectedCustomer;
+
+    Invoice? newInvoice = await ref
+        .read(quickBooksProvider)
+        .createInvoiceFromLines(lines, customer);
     ref.read(screenProvider).setIsGeneratingInvoice(false);
     if (newInvoice != null) {
       File? pdf = await ref.read(quickBooksProvider).downloadPDF(newInvoice);
@@ -124,6 +71,7 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
             context: context, builder: (context) => const IsPrintingDialog());
         // ignore: use_build_context_synchronously
         await PrintAPI.printPDF(context, pdf.path);
+        ref.read(todosProvider).clearTodos();
         Get.offAll(() => const QlBluetoothPrintPage(title: Constants.appName));
       } else {
         Fluttertoast.showToast(
@@ -142,7 +90,9 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
 
   @override
   Widget build(BuildContext context) {
-    bool isEmpty = _todos.isEmpty;
+    final List<Todo> todos = ref.watch(todosProvider).todos;
+
+    bool isEmpty = todos.isEmpty;
     final double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -172,15 +122,16 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
                       style: GoogleFonts.montserrat(),
                     ))
                   : Padding(
-                    padding: const EdgeInsets.only(top: 32.0),
-                    child: DataTable(
+                      padding: const EdgeInsets.only(top: 32.0),
+                      child: DataTable(
                         columns: <DataColumn>[
                           DataColumn(
                               label: SizedBox(
                                   width: width * 0.40,
                                   child: const Text(
                                     'Item',
-                                    style: TextStyle(fontStyle: FontStyle.italic),
+                                    style:
+                                        TextStyle(fontStyle: FontStyle.italic),
                                   ))),
                           DataColumn(
                               label: Container(
@@ -188,20 +139,21 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
                                   alignment: const Alignment(0.5, 0.0),
                                   child: const Text(
                                     'Price',
-                                    style: TextStyle(fontStyle: FontStyle.italic),
+                                    style:
+                                        TextStyle(fontStyle: FontStyle.italic),
                                   )))
                         ],
-                        rows: _todos.map((Todo todo) {
+                        rows: todos.map((Todo todo) {
                           return DataRow(cells: <DataCell>[
                             DataCell(Text(todo.name)),
                             DataCell(Container(
                                 alignment: const Alignment(1.0, 0.0),
-                                child:
-                                    Text('\$${todo.price.toStringAsFixed(2)}'))),
+                                child: Text(
+                                    '\$${todo.price.toStringAsFixed(2)}'))),
                           ]);
                         }).toList(),
                       ),
-                  ),
+                    ),
             ),
           ],
         ),
@@ -213,12 +165,12 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
         children: [
           SpeedDialChild(
             child: const Icon(Icons.add),
-            onTap: _displayDialog,
+            onTap: () => _displayDialog(todos),
             label: 'Add item',
           ),
           SpeedDialChild(
             child: const Icon(Icons.print),
-            onTap: _createInvoice,
+            onTap: () => _createInvoice(todos),
             label: 'Print invoice',
           ),
         ],

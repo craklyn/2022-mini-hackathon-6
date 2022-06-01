@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:another_quickbooks/another_quickbooks.dart';
 import 'package:another_quickbooks/quickbook_models.dart';
+import 'package:demo_another_brother_prime/customers.dart' as my;
 import 'package:demo_another_brother_prime/secrets.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -53,9 +54,9 @@ class QuickBooksAPI extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Invoice?> createInvoiceFromLines(List<Line>? lines) async {
+  Future<Invoice?> createInvoiceFromLines(List<Line>? lines, my.Customer customer) async {
     Invoice invoice = Invoice(
-      customerRef: ReferenceType(name: 'Test client', value: '1'),
+      customerRef: ReferenceType(name: customer.name, value: customer.id.toString()),
       line: lines
     );
 

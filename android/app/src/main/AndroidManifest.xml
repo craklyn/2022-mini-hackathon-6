@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.rouninlabs.demo_another_brother_prime">
    <application
-        android:label="demo_another_brother_prime"
-        android:name="Hana Hui"
+        android:label="Hana Hui"
+        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
