@@ -6,7 +6,6 @@ import 'package:demo_another_brother_prime/models/quickbooks_api.dart';
 import 'package:demo_another_brother_prime/models/todo.dart';
 import 'package:demo_another_brother_prime/print_api.dart';
 import 'package:demo_another_brother_prime/providers.dart';
-import 'package:demo_another_brother_prime/todo_item.dart';
 import 'package:demo_another_brother_prime/widgets/is_generating_invoice_dialog.dart';
 import 'package:demo_another_brother_prime/widgets/is_printing_dialog.dart';
 import 'package:flutter/material.dart';
@@ -52,17 +51,22 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
               ),
             ),
           ),
-          content: Column(mainAxisSize: MainAxisSize.min, // shrinks dialog to fit the content
+          content: Column(
+              mainAxisSize:
+                  MainAxisSize.min, // shrinks dialog to fit the content
               children: <Widget>[
                 SvgPicture.asset('assets/invoice.svg', width: 150, height: 150),
                 TextField(
                   controller: _textFieldController,
-                  decoration: const InputDecoration(hintText: 'Enter item description'),
+                  decoration:
+                      const InputDecoration(hintText: 'Enter item description'),
                 ),
                 TextField(
                   controller: _priceFieldController,
-                  decoration: const InputDecoration(hintText: 'Enter item price'),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration:
+                      const InputDecoration(hintText: 'Enter item price'),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
                   ], // allow two digit decimal numbers
@@ -73,7 +77,8 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
               child: Text('Add', style: Constants.customFont),
               onPressed: () {
                 Navigator.of(context).pop();
-                _addTodoItem(_textFieldController.text, _priceFieldController.text);
+                _addTodoItem(
+                    _textFieldController.text, _priceFieldController.text);
               },
             ),
           ],
@@ -88,12 +93,6 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
     });
     _textFieldController.clear();
     _priceFieldController.clear();
-  }
-
-  void _handleTodoChange(Todo todo) {
-    setState(() {
-      todo.checked = !todo.checked;
-    });
   }
 
   void _createInvoice() async {
@@ -111,14 +110,18 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
           )));
     }
     ref.read(screenProvider).setIsGeneratingInvoice(true);
-    showDialog(context: context, builder: (context) => const IsGeneratingInvoiceDialog());
-    Invoice? newInvoice = await ref.read(quickBooksProvider).createInvoiceFromLines(lines);
+    showDialog(
+        context: context,
+        builder: (context) => const IsGeneratingInvoiceDialog());
+    Invoice? newInvoice =
+        await ref.read(quickBooksProvider).createInvoiceFromLines(lines);
     ref.read(screenProvider).setIsGeneratingInvoice(false);
     if (newInvoice != null) {
       File? pdf = await ref.read(quickBooksProvider).downloadPDF(newInvoice);
       if (pdf != null) {
         ref.read(screenProvider).setIsPrinting(true);
-        showDialog(context: context, builder: (context) => const IsPrintingDialog());
+        showDialog(
+            context: context, builder: (context) => const IsPrintingDialog());
         // ignore: use_build_context_synchronously
         await PrintAPI.printPDF(context, pdf.path);
         Get.offAll(() => const QlBluetoothPrintPage(title: Constants.appName));
@@ -168,32 +171,37 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
                       'Click the button to add your first invoice item',
                       style: GoogleFonts.montserrat(),
                     ))
-                  : DataTable(
-                      columns: <DataColumn>[
-                        DataColumn(
-                            label: Container(
-                                width: width * 0.40,
-                                child: Text(
-                                  'Item',
-                                  style: TextStyle(fontStyle: FontStyle.italic),
-                                ))),
-                        DataColumn(
-                            label: Container(
-                                width: width * 0.25,
-                                alignment: Alignment(0.5, 0.0),
-                                child: Text(
-                                  'Price',
-                                  style: TextStyle(fontStyle: FontStyle.italic),
-                                )))
-                      ],
-                      rows: _todos.map((Todo todo) {
-                        return DataRow(cells: <DataCell>[
-                          DataCell(Text('${todo.name}')),
-                          DataCell(Container(
-                              child: Text('\$${todo.price.toStringAsFixed(2)}'), alignment: Alignment(1.0, 0.0))),
-                        ]);
-                      }).toList(),
-                    ),
+                  : Padding(
+                    padding: const EdgeInsets.only(top: 32.0),
+                    child: DataTable(
+                        columns: <DataColumn>[
+                          DataColumn(
+                              label: SizedBox(
+                                  width: width * 0.40,
+                                  child: const Text(
+                                    'Item',
+                                    style: TextStyle(fontStyle: FontStyle.italic),
+                                  ))),
+                          DataColumn(
+                              label: Container(
+                                  width: width * 0.25,
+                                  alignment: const Alignment(0.5, 0.0),
+                                  child: const Text(
+                                    'Price',
+                                    style: TextStyle(fontStyle: FontStyle.italic),
+                                  )))
+                        ],
+                        rows: _todos.map((Todo todo) {
+                          return DataRow(cells: <DataCell>[
+                            DataCell(Text(todo.name)),
+                            DataCell(Container(
+                                alignment: const Alignment(1.0, 0.0),
+                                child:
+                                    Text('\$${todo.price.toStringAsFixed(2)}'))),
+                          ]);
+                        }).toList(),
+                      ),
+                  ),
             ),
           ],
         ),
