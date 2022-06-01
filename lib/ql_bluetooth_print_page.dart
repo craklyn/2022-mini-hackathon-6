@@ -15,6 +15,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class QlBluetoothPrintPage extends ConsumerStatefulWidget {
   const QlBluetoothPrintPage({Key? key, required this.title}) : super(key: key);
@@ -148,7 +149,7 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
 
         title: Text(
           widget.title,
-          style: const TextStyle(color: Colors.white),
+          style: Constants.header,
         ),
       ),
       body: Padding(
@@ -162,9 +163,9 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
             ),
             Expanded(
               child: (isEmpty)
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                          'Click the button to add your first invoice item'))
+                          'Click the button to add your first invoice item', style: GoogleFonts.montserrat(),))
                   : ListView(
                       shrinkWrap: true,
                       padding: const EdgeInsets.symmetric(vertical: 8.0),

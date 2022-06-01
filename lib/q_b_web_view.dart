@@ -1,3 +1,4 @@
+import 'package:demo_another_brother_prime/constants.dart';
 import 'package:demo_another_brother_prime/models/quickbooks_api.dart';
 import 'package:demo_another_brother_prime/providers.dart';
 import 'package:demo_another_brother_prime/ql_bluetooth_print_page.dart';
@@ -27,7 +28,7 @@ class QBWebView extends ConsumerWidget {
 
           Navigator.of(context).pushReplacement(MaterialPageRoute(
               builder: (context) => const QlBluetoothPrintPage(
-                  title: 'QL-1110NWB Bluetooth Sample')));
+                  title: Constants.appName)));
           return NavigationDecision.prevent;
         }
         debugPrint('allowing navigation to $request');
