@@ -42,10 +42,12 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
             padding: const EdgeInsets.all(16.0),
             margin: const EdgeInsets.all(0.0),
             color: Theme.of(context).primaryColor,
-            child: const Text(
+            child: Text(
               'Add item to invoice',
-              style: TextStyle(
-                color: Colors.white,
+              style: GoogleFonts.montserrat(
+                textStyle: const TextStyle(
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
@@ -53,6 +55,7 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
               mainAxisSize:
                   MainAxisSize.min, // shrinks dialog to fit the content
               children: <Widget>[
+                SvgPicture.asset('assets/invoice.svg', width: 150, height: 150),
                 TextField(
                   controller: _textFieldController,
                   decoration:
@@ -66,7 +69,7 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
               ]),
           actions: <Widget>[
             TextButton(
-              child: const Text('Add'),
+              child: Text('Add', style: Constants.customFont),
               onPressed: () {
                 Navigator.of(context).pop();
                 _addTodoItem(
@@ -165,7 +168,9 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
               child: (isEmpty)
                   ? Center(
                       child: Text(
-                          'Click the button to add your first invoice item', style: GoogleFonts.montserrat(),))
+                      'Click the button to add your first invoice item',
+                      style: GoogleFonts.montserrat(),
+                    ))
                   : ListView(
                       shrinkWrap: true,
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
