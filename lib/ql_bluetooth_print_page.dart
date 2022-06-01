@@ -180,7 +180,7 @@ class QlBluetoothPrintPageState extends ConsumerState<QlBluetoothPrintPage> {
                         DataColumn(
                             label: Container(
                                 width: width * 0.25,
-                                alignment: Alignment(-1.0, 0.0),
+                                alignment: Alignment(0.5, 0.0),
                                 child: Text(
                                   'Price',
                                   style: TextStyle(fontStyle: FontStyle.italic),
